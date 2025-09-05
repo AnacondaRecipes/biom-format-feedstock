@@ -1,0 +1,78 @@
+{% set name = "biom-format" %}
+{% set version = "2.1.17" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name | replace('-', '_') }}-{{ version }}.tar.gz
+  sha256: 8e3fa07a432b3f6d5c3cad491ef1f27b18d10fc151ca2d223761be4f0b050479
+
+build:
+  number: 0
+  skip: true  # [py<39 or win32 or linux32 or python_impl == "pypy"]
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  entry_points:
+    - biom = biom.cli:cli
+  script_env:
+    - USE_CYTHON=1
+
+requirements:
+  build:
+    - make
+    - python
+    - cython
+    - numpy >=1.9.2
+    - h5py >=3.0.0
+    - {{ compiler('c') }}
+    - {{ stdlib('c') }}
+  host:
+    - python
+    - pip
+    - setuptools
+    - wheel
+    - cython
+    - numpy >=1.9.2
+    - h5py >=3.0.0
+  run:
+    - python
+    - click
+    - pandas >=0.20.0
+    - scipy >=1.3.1
+    - h5py >=3.0.0
+    - numpy >=1.9.2
+
+test:
+  imports:
+    - biom
+    - biom._filter
+    - biom._transform
+    - biom._subsample
+  requires:
+    - pytest >=6.2.4
+    - numpy
+  commands:
+    - pip check
+    - biom --help
+    - pytest --pyargs biom.tests -v
+
+about:
+  home: https://biom-format.org
+  license: BSD-3-Clause
+  license_family: BSD
+  license_file: COPYING.txt
+  summary: Biological Observation Matrix (BIOM) format
+  description: |
+    The BIOM file format (canonically pronounced biome) is designed to be a 
+    general-use format for representing biological sample by observation contingency tables.
+    BIOM is a recognized standard for the Earth Microbiome Project and
+    is a Genomics Standards Consortium supported project.
+  doc_url: https://biom-format.org
+  dev_url: https://github.com/biocore/biom-format
+
+extra:
+  recipe-maintainers:
+    - synapticarbors
+    - wasade
+    - nsoranzo
