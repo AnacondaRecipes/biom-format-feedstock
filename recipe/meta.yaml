@@ -49,6 +49,8 @@ test:
   requires:
     - pip
     - pytest >=6.2.4
+    # Upper bound to fix UT: E AttributeError: module 'numpy' has no attribute 'in1d'. Did you mean: 'int16'?
+    - numpy <2
   commands:
     - pip check
     - biom --help
