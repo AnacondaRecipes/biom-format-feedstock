@@ -39,6 +39,14 @@ requirements:
   run_constrained:
     - h5py >= 2.2.0
 
+# Some tests are not supported with numpy>=2
+# AttributeError: module 'numpy' has no attribute 'in1d'. Did you mean: 'int16'?
+{% set deselect_tests = "--deselect=test_cli/test_subset_table.py::TestSubsetTable::test_subset_observations_hdf5" %}
+{% set deselect_tests = deselect_tests + " --deselect=test_cli/test_subset_table.py::TestSubsetTable::test_subset_samples_hdf5" %}
+{% set deselect_tests = deselect_tests + " --deselect=test_table.py::TableTests::test_from_hdf5_observation_subset" %}
+{% set deselect_tests = deselect_tests + " --deselect=test_table.py::TableTests::test_from_hdf5_sample_subset" %}
+{% set deselect_tests = deselect_tests + " --deselect=test_table.py::TableTests::test_from_hdf5_subset_error" %}
+
 test:
   imports:
     - biom
@@ -49,13 +57,11 @@ test:
   requires:
     - pip
     - pytest >=6.2.4
-    # Upper bound to fix UT: E AttributeError: module 'numpy' has no attribute 'in1d'. Did you mean: 'int16'?
-    - numpy <2
   commands:
     - pip check
     - biom --help
     - python -c "from importlib.metadata import version as v; assert v('biom-format')=='{{ version }}'"
-    - pytest --pyargs biom.tests -v
+    - pytest -v --pyargs biom.tests {{ deselect_tests }}
 
 about:
   home: https://biom-format.org
