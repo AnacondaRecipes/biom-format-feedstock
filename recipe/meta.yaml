@@ -1,5 +1,5 @@
 {% set name = "biom-format" %}
-{% set version = "2.1.17" %}
+{% set version = "2.1.18" %}
 
 package:
   name: {{ name|lower }}
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name | replace('-', '_') }}-{{ version }}.tar.gz
-  sha256: 8e3fa07a432b3f6d5c3cad491ef1f27b18d10fc151ca2d223761be4f0b050479
+  sha256: fbb8cb19e459bbd1e8e2f8d34983a127245c6014f950ae082b9b19697484a315
 
 build:
-  number: 1
+  number: 0
   skip: true  # [py<39]
   script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   entry_points:
@@ -39,14 +39,6 @@ requirements:
   run_constrained:
     - h5py >= 2.2.0
 
-# Some tests are not supported with numpy>=2
-# AttributeError: module 'numpy' has no attribute 'in1d'. Did you mean: 'int16'?
-{% set deselect_tests = "--deselect=test_cli/test_subset_table.py::TestSubsetTable::test_subset_observations_hdf5" %}
-{% set deselect_tests = deselect_tests + " --deselect=test_cli/test_subset_table.py::TestSubsetTable::test_subset_samples_hdf5" %}
-{% set deselect_tests = deselect_tests + " --deselect=test_table.py::TableTests::test_from_hdf5_observation_subset" %}
-{% set deselect_tests = deselect_tests + " --deselect=test_table.py::TableTests::test_from_hdf5_sample_subset" %}
-{% set deselect_tests = deselect_tests + " --deselect=test_table.py::TableTests::test_from_hdf5_subset_error" %}
-
 test:
   imports:
     - biom
@@ -61,7 +53,7 @@ test:
     - pip check
     - biom --help
     - python -c "from importlib.metadata import version as v; assert v('biom-format')=='{{ version }}'"
-    - pytest -v --pyargs biom.tests {{ deselect_tests }}
+    - pytest -v --pyargs biom.tests
 
 about:
   home: https://biom-format.org
